@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       match: [/\S+@\S+\.\S+/, "is invalid"], // Regex for validating email format
     },
+    isForgotPassword: {
+      type: Boolean,
+      default: false,
+    },
     password: {
       type: String,
       required: true,

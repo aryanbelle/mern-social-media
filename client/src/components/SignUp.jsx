@@ -34,7 +34,7 @@ const SignUp = () => {
         if (response.status === 201) {
           const result = await response.json();
           console.log("Signed up successfully:", result);
-          
+
           // Pass username to OTP page
           navigate("/otp", { state: { username } });
         } else {
@@ -55,7 +55,7 @@ const SignUp = () => {
       <div className="bg-white w-full max-w-4xl flex rounded-lg shadow-lg">
         {/* Left Side: Form */}
         <div className="w-full max-w-md p-8 space-y-6">
-          <h2 className="text-3xl font-bold text-center text-gray-700">Sign Up</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-700">Create Account</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
             <div>
@@ -103,9 +103,9 @@ const SignUp = () => {
             <button
               type="submit"
               disabled={isLoading} // Disable button while loading
-              className={`w-full py-3 rounded-md transition duration-200 ${isLoading ? 'bg-gray-500' : 'bg-blue-700'} text-white ${isLoading ? 'cursor-not-allowed' : 'hover:bg-blue-800'}`}
+              className={`w-full py-3 rounded-md font-medium transition duration-200 ${isLoading ? 'bg-gray-500' : 'bg-blue-700'} text-white ${isLoading ? 'cursor-not-allowed' : 'hover:bg-blue-800'}`}
             >
-              {isLoading ? "Signing Up..." : "Sign Up"}
+              {isLoading ? "Creating..." : "Create"}
             </button>
           </form>
 
@@ -114,7 +114,7 @@ const SignUp = () => {
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
               <a href="/signin" className="text-blue-500 font-semibold hover:text-blue-700">
-                Login
+                Sign in
               </a>
             </p>
           </div>

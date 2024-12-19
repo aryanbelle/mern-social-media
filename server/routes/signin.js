@@ -1,42 +1,72 @@
-const Router = require("express").Router();
-Router.post("/", async (req, res) => {
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user"); // Import your User model
+require("dotenv").config();
+const router = express.Router();
+
+// Route for signing in
+router.post("/", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { identifier, password } = req.body;
 
-    // Validation
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    // Check if identifier and password are provided
+    if (!identifier || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Username/Email and password are required.",
+      });
     }
 
-    // Check if email or username already exists
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Username or Email already exists" });
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new user
-    const newUser = new User({
-      username,
-      email,
-      password: hashedPassword,
+    // Find the user by email or username
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
     });
 
-    // Save to database
-    await newUser.save();
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
+    }
 
-    res.status(201).json({
-      message: "User registered successfully",
-      user: { username: newUser.username, email: newUser.email },
+    // Compare the provided password with the stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid password." });
+    }
+
+    // Check if the user is verified
+    if (!user.isVerified) {
+      return res
+        .status(403)
+        .json({ success: false, message: "User is not verified." });
+    }
+
+    // Generate a JSON Web Token (JWT)
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" } // Token expires in 1 hour
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Sign-in successful.",
+      token,
+      user: {
+        username: user.username,
+        email: user.email,
+      },
     });
   } catch (error) {
-    console.error("Error during signup:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error during sign-in:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error." });
   }
 });
 
-module.exports = Router;
+module.exports = router;

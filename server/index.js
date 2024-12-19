@@ -1,11 +1,11 @@
 const express = require("express");
 const connectDB = require("./config/dbConnect");
 require("dotenv").config();
-
+const updatePassword = require("./routes/updatePassword");
 const signupRoute = require("./routes/signup");
 const signinRoute = require("./routes/signin");
-const verifyUser = require("./routes/verifyUser");
-
+const verifyUserRoute = require("./routes/verifyUser");
+const forgotPassword = require("./routes/forgotPassword");
 const app = express();
 const PORT = process.env.PORT;
 connectDB();
@@ -17,8 +17,9 @@ app.get("/", (req, res) => {
 
 app.use("/signup", signupRoute);
 app.use("/signin", signinRoute);
-app.use("/verify", verifyUser);
-
+app.use("/verify", verifyUserRoute);
+app.use("/forgot-password", forgotPassword);
+app.use("/update-password", updatePassword);
 // Handle undefined routes (404)
 app.use((req, res) => {
   res.status(404).send("Page Not Found");

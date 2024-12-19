@@ -1,19 +1,57 @@
 import React, { useState } from "react";
 import AuthImg from "../assets/auth.jpg";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [emailOrUsername, setEmailOrUsername] = useState("");  // Accept either email or username
+  const [identifier, setIdentifier] = useState("");  // Accept either email or username
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!emailOrUsername || !password) {
+    
+    if (!identifier || !password) {
       setError("Please fill in both fields");
+      return;
     } else {
       setError("");
-      // Implement your login logic here
-      console.log("Logged in successfully with", { emailOrUsername, password });
+      setIsLoading(true); // Set loading to true when request starts
+      try {
+        // Send POST request to backend /signin route
+        const response = await fetch("/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            identifier,
+            password,
+          }),
+        });
+
+        // Handle response
+        if (response.ok) {
+          const result = await response.json();
+          console.log("Logged in successfully:", result);
+          const token = result.token;
+          const username = result.user.username;
+
+          localStorage.setItem("mytoken", token);
+          localStorage.setItem("username", username);
+          navigate("/");  // Redirect to home after successful login
+        } else {
+          const errorData = await response.json();
+          setError(errorData.message || "Login failed. Please try again.");
+        }
+      } catch (err) {
+        setError("An error occurred. Please try again.");
+        console.error("Error during login:", err);
+      } finally {
+        setIsLoading(false);  // Set loading to false after request is complete
+      }
     }
   };
 
@@ -22,7 +60,7 @@ const Login = () => {
       <div className="bg-white w-full max-w-4xl flex rounded-lg shadow-lg">
         {/* Left Side: Form */}
         <div className="w-full max-w-md p-8 space-y-6">
-          <h2 className="text-3xl font-bold text-center text-gray-700">Login</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-700">Welcome back!!</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm text-left font-medium text-gray-600">
@@ -30,9 +68,9 @@ const Login = () => {
               </label>
               <input
                 type="text"
-                value={emailOrUsername}
+                value={identifier}
                 required
-                onChange={(e) => setEmailOrUsername(e.target.value)}
+                onChange={(e) => setIdentifier(e.target.value)}
                 className="mt-1 block w-full p-3 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="Enter your email or username"
               />
@@ -51,17 +89,18 @@ const Login = () => {
 
             {/* Forgot Password Link */}
             <div className="flex justify-between items-center">
-              <p className="text-sm text-blue-500 hover:text-blue-700">
-                <a href="/forgot-password">Forgot password?</a>
+              <p className="text-sm text-blue-500 font-medium hover:text-blue-700">
+                <a href="/forgotpassword">Forgot password?</a>
               </p>
             </div>
 
             {error && <p className="text-sm text-red-500">{error}</p>}
             <button
               type="submit"
-              className="w-full bg-blue-700 text-white py-3 rounded-md hover:bg-blue-800 transition duration-200"
+              disabled={isLoading} // Disable button while loading
+              className={`w-full py-3 font-medium rounded-md transition duration-200 ${isLoading ? 'bg-gray-500' : 'bg-blue-700'} text-white ${isLoading ? 'cursor-not-allowed' : 'hover:bg-blue-800'}`}
             >
-              Sign In
+              {isLoading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 

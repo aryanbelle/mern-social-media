@@ -43,7 +43,7 @@ const OTPVerification = () => {
                 if (response.status === 200) {
                     const result = await response.json();
                     console.log("OTP verified successfully:", result);
-                    navigate("/");
+                    navigate("/uploadpfp");
                     // Redirect or show a success message
                 } else {
                     const errorData = await response.json();

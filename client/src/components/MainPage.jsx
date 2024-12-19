@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import InputPosts from "./InputPosts";
 import Posts from "./Posts";
 import ScreenShot from "../assets/ss.png";
 import ScreenShot2 from "../assets/ss2.png";
+import AuthImg from "../assets/auth.jpg";
 import "../css/Posts.css";
 
 const MainPage = () => {
     const [selectedPost, setSelectedPost] = useState(null); // State to hold the selected post
+    const [myUsername, setMyUsername] = useState("");
     const recommendedUsers = [
         { id: 1, username: "user1", followers: "500", pfp: "https://via.placeholder.com/150" },
         { id: 2, username: "user2", followers: "300", pfp: "https://via.placeholder.com/150" },
@@ -42,6 +44,12 @@ const MainPage = () => {
         setSelectedPost(post); // Set the selected post
     };
 
+
+    useEffect(()=>{
+        const my_user_name = localStorage.getItem("username");
+        setMyUsername(my_user_name);
+    },[]);
+
     return (
         <>
             <Navbar />
@@ -58,7 +66,7 @@ const MainPage = () => {
                                     className="w-full h-full rounded-full object-cover"
                                 />
                             </div>
-                            <h2 className="text-lg font-medium text-gray-800 mb-2">@Username</h2>
+                            <h2 className="text-lg font-medium text-gray-800 mb-2">@{myUsername}</h2>
                             <p className="text-sm text-gray-600 text-center mb-6">
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                             </p>

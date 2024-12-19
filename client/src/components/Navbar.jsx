@@ -1,13 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Home");  // Set "Home" as default active tab
-
+  const [myUsername, setMyUsername] = useState("");
   const dropdownRef = useRef(null);
+
+  const navigate = useNavigate();
 
   // Close dropdown when clicking outside of it
   useEffect(() => {
+
+    const my_user_name = localStorage.getItem("username");
+    setMyUsername(my_user_name);
+
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
@@ -26,6 +33,12 @@ const Navbar = () => {
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
   };
+
+  const handleLogOut = ()=>{
+    localStorage.removeItem("mytoken");
+    localStorage.removeItem("username");
+    navigate("/signup");
+  }
 
   return (
     <nav className="flex items-center justify-between px-4 py-2 bg-transparent w-full">
@@ -177,7 +190,7 @@ const Navbar = () => {
               className="w-8 h-8 rounded-full"
             />
             <span className="font-medium text-gray-700 select-none">
-              John Doe
+              {myUsername}
             </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -202,7 +215,7 @@ const Navbar = () => {
               }}
             >
               <ul>
-                <li className="px-4 py-2 text-red-500 hover:bg-red-100 cursor-pointer transition duration-150">
+                <li onClick={handleLogOut} className="px-4 py-2 text-red-500 hover:bg-red-100 cursor-pointer transition duration-150">
                   Logout
                 </li>
               </ul>
