@@ -5,6 +5,7 @@ import SignUp from './components/SignUp';
 import Navbar from './components/Navbar';
 import MainPage from './components/MainPage';
 import PostDetail from './components/PostDetail';
+import OTPVerification from './components/OTPVerification';
 function App() {
   return (
     <Router>
@@ -20,6 +21,7 @@ function App() {
 
           {/* Route for MainPage (Home) */}
           <Route path="/" element={<MainPage />} />
+          <Route path="/otp" element={<OTPVerification />} />
         </Routes>
       </div>
     </Router>

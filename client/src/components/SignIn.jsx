@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AuthImg from "../assets/auth.jpg";
 
 const Login = () => {
   const [emailOrUsername, setEmailOrUsername] = useState("");  // Accept either email or username
@@ -67,7 +68,7 @@ const Login = () => {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
-              <a href="/signup" className="text-blue-500 hover:text-blue-700">
+              <a href="/signup" className="text-blue-500 font-semibold hover:text-blue-700">
                 Sign up
               </a>
             </p>
@@ -75,9 +76,9 @@ const Login = () => {
         </div>
 
         {/* Right Side: Illustration */}
-        <div className="hidden lg:flex w-1/2 bg-blue-50 rounded-r-lg items-center justify-center">
+        <div className="hidden lg:flex w-1/2 rounded-r-lg items-center justify-center">
           <img
-            src="https://via.placeholder.com/400x300" // Replace with your own illustration image
+            src={AuthImg} // Replace with your own illustration image
             alt="Login Illustration"
             className="w-full max-w-sm"
           />

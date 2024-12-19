@@ -1,19 +1,52 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AuthImg from "../assets/auth.jpg";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!email || !username || !password) {
       setError("Please fill in all fields");
     } else {
       setError("");
-      // Implement your signup logic here
-      console.log("Signed up successfully with", { email, username, password });
+      setIsLoading(true); // Start loading
+
+      const data = { email, username, password };
+
+      try {
+        const response = await fetch("/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.status === 201) {
+          const result = await response.json();
+          console.log("Signed up successfully:", result);
+          
+          // Pass username to OTP page
+          navigate("/otp", { state: { username } });
+        } else {
+          const errorData = await response.json();
+          setError(errorData.message || "Signup failed. Please try again.");
+        }
+      } catch (err) {
+        setError("An error occurred. Please try again.");
+        console.error("Error during signup:", err);
+      } finally {
+        setIsLoading(false); // Stop loading after request is complete
+      }
     }
   };
 
@@ -69,9 +102,10 @@ const SignUp = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-blue-700 text-white py-3 rounded-md hover:bg-blue-800 transition duration-200"
+              disabled={isLoading} // Disable button while loading
+              className={`w-full py-3 rounded-md transition duration-200 ${isLoading ? 'bg-gray-500' : 'bg-blue-700'} text-white ${isLoading ? 'cursor-not-allowed' : 'hover:bg-blue-800'}`}
             >
-              Sign Up
+              {isLoading ? "Signing Up..." : "Sign Up"}
             </button>
           </form>
 
@@ -79,7 +113,7 @@ const SignUp = () => {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
-              <a href="/login" className="text-blue-500 hover:text-blue-700">
+              <a href="/signin" className="text-blue-500 font-semibold hover:text-blue-700">
                 Login
               </a>
             </p>
@@ -87,9 +121,9 @@ const SignUp = () => {
         </div>
 
         {/* Right Side: Illustration */}
-        <div className="hidden lg:flex w-1/2 bg-blue-50 rounded-r-lg items-center justify-center">
+        <div className="hidden lg:flex w-1/2 rounded-r-lg items-center justify-center">
           <img
-            src="https://via.placeholder.com/400x300" // Replace with your own illustration image
+            src={AuthImg} // Replace with your own illustration image
             alt="Sign Up Illustration"
             className="w-full max-w-sm"
           />
